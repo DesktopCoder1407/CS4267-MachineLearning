@@ -102,16 +102,95 @@ X_scaled_test = scaler.transform(X_test)
 import tensorflow as tf
 from keras import Sequential
 from keras.layers import Dense
+
+# #First test of the model
+# model = Sequential([
+#     Dense(units=32, activation='relu'),
+#     Dense(units=1)
+# ])
+# model.compile(loss='mean_squared_error', optimizer=tf.keras.optimizers.Adam(0.1))
+# model.fit(X_scaled_train, y_train, epochs=100, verbose=True)
+# predictions = model.predict(X_scaled_test)
+
+# #Predict the test data and display metrics
+# from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
+# print("MSE: %.3f" % mean_squared_error(y_test, predictions))
+# print("MAE: %.3f" % mean_absolute_error(y_test, predictions))
+# print("R^2: %.3f" % r2_score(y_test, predictions))
+
+##Fine tuning the Neural Network
+#from tensorboard.plugins.hparams import api as hp
+#HP_HIDDEN = hp.HParam('hidden_size', hp.Discrete([64, 32, 16])) #Size of the Hidden Layer
+#HP_EPOCHS = hp.HParam('epochs', hp.Discrete([300, 1000])) #Number of Epochs
+#HP_LEARNING_RATE = hp.HParam('learning_rate', hp.RealInterval(0.01, 0.4)) #Continuous value determining the Learning Rate
+
+# def train_test_model(hparams, logdir):
+#     model = Sequential([
+#         Dense(units=hparams[HP_HIDDEN], activation='relu'),
+#         Dense(units=1)
+#     ])
+#     model.compile(loss='mean_squared_error', 
+#         optimizer=tf.keras.optimizers.Adam(hparams[HP_LEARNING_RATE]),
+#         metrics=['mean_squared_error'])
+#     model.fit(X_scaled_train, y_train, validation_data=(X_scaled_test, y_test),
+#         epochs=hparams[HP_EPOCHS], verbose=False,
+#         callbacks=[
+#             tf.keras.callbacks.TensorBoard(logdir),
+#             hp.KerasCallback(logdir, hparams),
+#             tf.keras.callbacks.EarlyStopping(
+#                 monitor='val_loss', min_delta=0, patience=200, verbose=0, mode='auto',
+#             )
+#         ],
+#         )
+#     _, mse = model.evaluate(X_scaled_test, y_test)
+#     pred = model.predict(X_scaled_test)
+#     r2 = r2_score(y_test, pred)
+#     return mse, r2
+
+# def run(hparams, logdir):
+#     with tf.summary.create_file_writer(logdir).as_default():
+#         hp.hparams_config(
+#             hparams=[HP_HIDDEN, HP_EPOCHS, HP_LEARNING_RATE],
+#             metrics=[hp.Metric('mean_squared_error', display_name='mse'),
+#                     hp.Metric('r2', display_name='r2')],
+#         )
+#         mse, r2 = train_test_model(hparams, logdir)
+#         tf.summary.scalar('mean_squared_error', mse, step=1)
+#         tf.summary.scalar('r2', r2, step=1)
+
+# session_num = 0
+# for hidden in HP_HIDDEN.domain.values:
+#     for epochs in HP_EPOCHS.domain.values:
+#         for learning_rate in tf.linspace(HP_LEARNING_RATE.domain.min_value,
+#                                         HP_LEARNING_RATE.domain.max_value, 5):
+#             hparams = {
+#                 HP_HIDDEN: hidden,
+#                 HP_EPOCHS: epochs,
+#                 HP_LEARNING_RATE: float("%.2f"%float(learning_rate)),
+#             }
+#             run_name = "run-%d" % session_num
+#             print('--- Starting trial: %s' % run_name)
+#             print({h.name: hparams[h] for h in hparams})
+#             run(hparams, 'logs/hparam_tuning/' + run_name)
+#             session_num += 1
+
+#Optimal Neural Network Model (Used Size/Epochs/Learning rate from highest r^2 from test above)
 model = Sequential([
     Dense(units=32, activation='relu'),
     Dense(units=1)
 ])
-model.compile(loss='mean_squared_error', optimizer=tf.keras.optimizers.Adam(0.1))
-model.fit(X_scaled_train, y_train, epochs=100, verbose=True)
-predictions = model.predict(X_scaled_test)
+model.compile(loss='mean_squared_error', optimizer=tf.keras.optimizers.Adam(0.3))
+model.fit(X_scaled_train, y_train, epochs=1000, verbose=False)
+predictions = model.predict(X_scaled_test)[:, 0]
 
-#Predict the test data and display metrics
-from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
-print("MSE: %.3f" % mean_squared_error(y_test, predictions))
-print("MAE: %.3f" % mean_absolute_error(y_test, predictions))
-print("R^2: %.3f" % r2_score(y_test, predictions))
+#Plot prediction with Ground truth
+import matplotlib.pyplot as plt
+plt.plot(data_test.index, y_test, c='k')
+plt.plot(data_test.index, predictions, c='b')
+plt.plot(data_test.index, predictions, c='r')
+plt.plot(data_test.index, predictions, c='g')
+plt.xticks(range(0,252,10), rotation=60)
+plt.xlabel('Date')
+plt.ylabel('Close price')
+plt.legend(['Truth', 'Neural network prediction'])
+plt.show()
