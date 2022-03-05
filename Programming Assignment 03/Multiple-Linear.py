@@ -5,10 +5,18 @@ import pandas as pd
 
 startTime = datetime.datetime.now()
 
-# Importing the dataset (X is Product_1, Product_2, and Product_3)
+# Importing the dataset
 dataset = pd.read_csv('data/Multiple-Linear-Dataset.csv')
-X = dataset.iloc[:, 0:3].values
+X = dataset.iloc[:, :-1]
 y = dataset.iloc[:, 4].values
+
+# Encoding categorical data
+# -------------------------
+from sklearn.preprocessing import LabelBinarizer
+enc = LabelBinarizer()
+new_Location = enc.fit_transform(X['Location'])
+new_df = pd.DataFrame(new_Location)
+X = pd.concat([X, new_df], axis=1).drop(['Location'], axis=1).values
 
 # Splitting the dataset into the Training set and Test set
 from sklearn.model_selection import train_test_split
