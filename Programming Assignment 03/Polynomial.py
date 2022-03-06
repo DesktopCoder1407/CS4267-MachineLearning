@@ -1,9 +1,11 @@
 # Importing libraries
-import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
+import datetime
 from sklearn.linear_model import LinearRegression
 from sklearn.preprocessing import PolynomialFeatures
+
+startTime = datetime.datetime.now()
 
 # Importing the dataset
 dataset = pd.read_csv('data/Polynomial-Dataset.csv')
@@ -37,6 +39,7 @@ print('''Polynomial Regression of Degree 3 | Employee's salary at level 6.5:\t''
       lin_reg_3.predict(poly_reg_3.fit_transform([[6.5]])))
 print('''Polynomial Regression of Degree 4 | Employee's salary at level 6.5:\t''',
       lin_reg_4.predict(poly_reg_4.fit_transform([[6.5]])))
+print('Time to train all models: ', datetime.datetime.now() - startTime)
 
 # Visualising the Linear Regression and Polynomial Regression results
 plt.scatter(X, y, color='black', label='Raw Data')
