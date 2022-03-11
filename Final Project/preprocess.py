@@ -2,7 +2,6 @@ import pandas
 
 RAW_DATA_PATH = 'data/raw_listings.csv'
 TRIMMED_DATA_PATH = 'data/raw_listings_trimmed.csv'
-CLEAN_DATA_PATH = 'data/cleaned_listings.csv'
 
 
 def trim_clean_raw(path):
@@ -29,7 +28,7 @@ def generate_one_hot_data(path):
     data = pandas.concat([data, pandas.get_dummies(data['Make'])], axis=1).drop(columns=['Make'])
     data = pandas.concat([data, pandas.get_dummies(data['Model'])], axis=1).drop(columns=['Model'])
 
-    data.to_csv(CLEAN_DATA_PATH, index=False)
+    return data
 
 
 if __name__ == "__main__":
