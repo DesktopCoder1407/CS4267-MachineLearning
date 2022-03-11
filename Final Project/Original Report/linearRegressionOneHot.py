@@ -25,8 +25,6 @@ def linearRegressionOneHot(filename):
     print(f"The Score on the test set is {score}")
     score = model.score(X_train, y_train)
     print(f"The Score on the train set is {score}")
-    print(f"Coefficients: {model.coef_}")
-    print(f"Intercept: {model.intercept_}")
     #scores = []
     # kfold = KFold(n_splits=3, shuffle=True, random_state=42)
     # for i, (train, test) in enumerate(kfold.split(X, y)):
