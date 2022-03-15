@@ -9,7 +9,7 @@ from sklearn.metrics import mean_squared_error, r2_score
 
 start_time = time.time()
 
-data = generate_one_hot_data(TRIMMED_DATA_PATH)  # .sample(frac=.25, random_state=0)
+data = generate_one_hot_data(TRIMMED_DATA_PATH)
 x = data.drop(columns=['sellingprice'])
 y = data['sellingprice']
 
