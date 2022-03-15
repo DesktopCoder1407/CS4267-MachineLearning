@@ -1,13 +1,11 @@
 from preprocess import *
 import pandas
 import matplotlib.pyplot as plt
+import seaborn
 
 
 def plot_for_linearity(path):
     data = pandas.read_csv(path)
-
-    # Trim data to be of only one car type (Allows for better check of whether data is linear or not)
-    data = data[data['model'].str.contains('accord')]
 
     y = data['sellingprice']
 
@@ -43,6 +41,23 @@ def plot_for_linearity(path):
     plt.savefig('images/mmr_to_price.png')
     plt.close()
 
+    #Condensed Linearity Scatter
+    x_vars = ['year', 'condition', 'odometer', 'mmr']
+    y_vars = ['sellingprice']
+    g = seaborn.PairGrid(pandas.read_csv(TRIMMED_DATA_PATH), x_vars=x_vars, y_vars=y_vars, height=3)
+    g.map(seaborn.scatterplot)
+    plt.savefig('images/linearity.png')
+    plt.close()
+
+
+def plot_heatmap(path):
+    data = pandas.read_csv(path)
+    corr = data.corr()
+    seaborn.heatmap(corr, annot=True, cmap='RdYlGn')
+    plt.savefig('images/heatmap.png')
+    plt.close()
+
 
 if __name__ == '__main__':
     plot_for_linearity(TRIMMED_DATA_PATH)
+    plot_heatmap(TRIMMED_DATA_PATH)
