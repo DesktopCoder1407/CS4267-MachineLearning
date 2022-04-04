@@ -41,14 +41,6 @@ def plot_for_linearity(path):
     plt.savefig('images/mmr_to_price.png')
     plt.close()
 
-    #Condensed Linearity Scatter
-    x_vars = ['year', 'condition', 'odometer', 'mmr']
-    y_vars = ['sellingprice']
-    g = seaborn.PairGrid(pandas.read_csv(TRIMMED_DATA_PATH), x_vars=x_vars, y_vars=y_vars, height=3)
-    g.map(seaborn.scatterplot)
-    plt.savefig('images/linearity.png')
-    plt.close()
-
 
 def plot_heatmap(path):
     data = pandas.read_csv(path)
