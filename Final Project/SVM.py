@@ -1,7 +1,9 @@
 from preprocess import *
 import time
 from sklearn.model_selection import train_test_split
-from sklearn.linear_model import LinearRegression
+from sklearn.pipeline import make_pipeline
+from sklearn.preprocessing import StandardScaler
+from sklearn.svm import LinearSVR
 from sklearn.metrics import mean_squared_error, r2_score
 from math import sqrt
 
@@ -11,7 +13,7 @@ data = generate_one_hot_data(TRIMMED_DATA_PATH)
 x = data.drop(columns=['sellingprice'])
 y = data['sellingprice']
 
-model = LinearRegression()
+model = make_pipeline(StandardScaler(), LinearSVR(tol=.075))
 x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.10, random_state=0)
 
 model.fit(x_train, y_train)

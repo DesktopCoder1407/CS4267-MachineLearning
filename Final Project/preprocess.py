@@ -1,3 +1,4 @@
+import matplotlib.pyplot as plt
 import pandas
 import numpy as np
 
@@ -30,6 +31,14 @@ def trim_raw_data(path):
     data = data[np.abs(data.sellingprice - data.sellingprice.mean()) <= (3 * data.sellingprice.std())]
     data = data[np.abs(data.odometer - data.odometer.mean()) <= (3 * data.odometer.std())]
     data = data[np.abs(data.mmr - data.mmr.mean()) <= (3 * data.mmr.std())]
+
+    # Histogram of no outliers
+    plt.hist(data['sellingprice'], bins=75)
+    plt.xlabel('Used Vehicle Sale Price')
+    plt.ylabel('Frequency of Sale Price')
+    plt.title('Sale Price Frequency After Preprocessing')
+    plt.savefig('images/preprocessing.png')
+    plt.close()
 
     data.to_csv(TRIMMED_DATA_PATH, index=False)
 
