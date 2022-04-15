@@ -29,7 +29,7 @@
 %%%%%%%%%%%%%%%%
 \begin{document}
 %%%%%%%%%%%%%%%%
-\title{Feature-Based Used Car Price Predictor}
+\title{Feature-Based Used Car Price Predictor Using Linear Regression and Support Vector Machines}
 
 \author{Parker~Smith
 \thanks{P. Smith is with the College of Computing and Software Engineering, Kennesaw State University, Marietta, GA, 30060 USA. Email: psmit216@students.kennesaw.edu}}
@@ -38,11 +38,11 @@
 \IEEEtitleabstractindextext{%
     
     \begin{abstract}
-    Predicting the price of a used car based on its features is an important task for buyers and car salesmen alike. This project can take a vehicle's make, model, odometer reading, year, condition, and color, among other factors, and produce an accurate selling price. Plotting the datapoints displayed a heavily linear correlation between the continuous factors and the selling price, leading to the conclusion that a multiple linear regression model would be the most efficient model to use. A traditional Artificial Neural Network model was also implemented as it had a high chance to provide accurate results due to the large number of datapoint features, although with the added cost of a longer training time. The input to both models was used car data from 2015 and earlier with four continuous factors and eight categorical features that were encoded using a OneHot encoding scheme. Within the neural network, both the Adam optimizer and early stopping allowed for a quicker training time and more efficient results. Ultimately, both the linear regression model and the neural network model kept to an ${R^2}$ accuracy of 97\%. However, the linear regression model was ten times faster to train, therefore becoming the most optimal model to predict used car prices.
+    Cars are often the second largest purchase that most people make. Therefore, for a car purchaser, it is important to know how much a specific vehicle truly costs and whether the price they are paying is inflated. In addition, car salesmen must know an accurate price of the car they are selling so they can make the most profit from their sale. Finally, private car sellers wish to sell their car quickly, yet not under-price their vehicle. This problem of predicting the price of a car can be solved by inputting the car's features through a machine learning algorithm. In doing so, all users will be able to obtain an objective view of how much the vehicle is worth. Current models allow users to input a Vehicle Identification Number or enter a make and model of a vehicle to get a price result. However, these models tend to have accuracies lower than 85\%. This project attempts to solve this problem in a different way by implementing two models: Linear Regression and a Support Vector Machine. The primary evaluation metrics for these models are their $R^2$ accuracy, their Mean Square Error, their Root Mean Square Error, and their training time. Both models have a large dataset of vehicle features such as make, model, condition, transmission type, color, odometer reading, and many others. With this larger feature set, both models achieved better results when compared to the baseline project by Kumbar, Gadre, and Nayak. The baseline's best model had an $R^2$ accuracy of 87\% and a training time of 15 minutes while this project's models had an $R^2$ accuracy of 97\%, a Root Mean Squared Error of \$1,450, and a training time of less than a minute. Due to the larger feature set and improved models, this project's Linear Regression and Support Vector Machine models are both accurate enough to predict the approximate value of a car using only an input of features.
     \end{abstract}
     %%%%%%%%%%%%%%%%
     \begin{IEEEkeywords}
-    Artificial neural networks, computer science, data analysis, data processing, deep learning, land vehicles, linear approximation, machine learning, neural networks, optimization, performance analysis, python, supervised learning, transportation, vehicles
+    Computer science, data analysis, data processing, deep learning, land vehicles, linear approximation, machine learning, neural networks, optimization, performance analysis, python, supervised learning, transportation, vehicles
     \end{IEEEkeywords}
     %%%%%%%%%%%%%%%%%%%%%%%
 }
@@ -50,107 +50,184 @@
 \maketitle
 \IEEEdisplaynontitleabstractindextext
 \section{Introduction}
-Determining an optimal price for a used car has often been a difficult task. There are often many factors to weigh: mileage, condition, make, model, the age of the vehicle, and several more. In deciding to purchase a used car, one must weigh all these factors, together with the listed price of the car, to determine whether the deal is fair. Used car salesmen must also do the same, figuring out the most profitable price for a car that will still not turn away potential buyers.
+As the second largest purchase most people make, cars, and the car industry, are very important to the economy. In 2018, motor vehicles and parts accounted for \$521.5 billion of the US's Gross Domestic Product (GDP) \cite{website:auto_industry}. Of course, due to the high economic impact and comparatively large price tag of most cars, many people are hesitant when it comes to purchasing a new car. The average price of a new car is \$46,426, whereas the average price of a used car is only \$30,000 \cite{website:car_prices}. This price gap has led many consumers to lean towards purchasing used cars. However, determining an optimal price for a used car is a difficult task. There are many factors to weigh including economic factors, make, body style, mileage, transmission type, condition, and more \cite{website:value_factors}. A consumer must weigh all these factors, along with the listed price of the car, to determine whether they wish to purchase that car or not. This project intends to create a Linear Regression model \cite{model:multiple_linear_regression} to allow any user to quickly determine an accurate price for a used car based solely on its features.
 
-For buyers, this process is time consuming and exhausting. Quite often, they must search through hundreds of listings to find a deal that they believe best suits their needs. Unfortunately, the price they pay for their used car may still be excessive. A simple machine learning algorithm to provide an acceptable price to aim for based on the specific type of car and features of that car is exactly what would benefit them.
+This is important for consumers because it allows them to save time when purchasing a new car. Currently, a consumer must find the right kind of car for them, then search through hundreds of listings to find a price that they feel is appropriate. Unfortunately, this price may still be excessive. Using machine learning, a consumer could simply input the features they are looking for and the algorithm would output a fair and reasonable price for that type of car. 
 
-For car salesmen, the process of selling a used car also has its challenges. Of course, a car salesman always wants as much profit as possible off of their used cars. However, if they price too high or too low, they either cannot find buyers or make too little profit off of a vehicle. Therefore, as for the buyers, an algorithm that will, based on the features of the car they have, display an appropriate listing price would be optimal for salesmen. They would then be able to get a decent profit while still attracting buyers.
+Devising a fair used car price is also important for car salesman. Their primary goal is to gain as much profit as possible off of the sale of a used car while still maintaining a price that attracts buyers. If they price too high or too low, they either cannot find buyers or they make too little profit off of a vehicle. Similar to consumers, an algorithm that will display an appropriate listing price based on the features of the cars they have in stock would be optimal for professional salesmen.
 
-At first, this entire process had to be done by manually tracking through previous car listings and their sale prices. An appropriate price was manually listed to a car based on whether its features matched to a corresponding listing. However, that all changed with the introduction of websites such as Kelly Blue Book \cite{website:kbb}, TrueCar \cite{website:truecar}, and CARFAX \cite{website:carfax}. These commercial websites allow users to input their VIN number and licence plate number and have an approximate vehicle price given based on the car's features extrapolated from the VIN number. This process is perfect for used car salesmen, but is not as ideal for a potential buyer.
+Another party that can benefit from this project is private car sellers. Currently, private sellers have difficulty in the car market as they often have an over-inflated sense of how much their car is worth \cite{website:private_seller}. Using the models from this project, private sellers could determine an accurate price for their vehicle based on some of its features including condition and mileage, and become competitive on the market. This would attract more buyers and lead to much quicker sales.
 
-Therefore, for this project, I intend to ease this problem by creating a model which can predict the approximate price of a used car based on its features. This eliminates the manual activity of searching through previous listings: a process which tends to be quite inaccurate. In addition, it allows potential buyers to input the features they are looking for into the model and a reasonable price for the vehicle will be returned, avoiding the problem with entering a VIN number. Used car salesmen can also use the model as well, as it is more attuned to the features of a generic car rather than a specific VIN number. Overall, this will lead to a quicker determination of the fair price of a used car for both buyers and salesmen.
+Currently, users can use websites such as Kelly Blue Book \cite{website:kbb}, TrueCar \cite{website:truecar}, and CARFAX \cite{website:carfax} to input a car's Vehicle Identification Number (VIN) and licence plate number and have an approximate price given based on features extrapolated from the VIN number. This is an effective method if a consumer or private seller is attempting to look up a value for a specific car, but not helpful if the user is just trying to figure out what is a good deal and what is not. This is also a suitable solution for car salesmen who always have the VIN and licence plate numbers of their cars in stock.
+
+The baseline for this project builds upon current car price websites by specifically using features from a car, rather than just a VIN, to predict the car's price. This allows for a more general estimate. The baseline project is from a report published by Kumbar, Gadre, and Nayak \cite{baseline}. The dataset for their model contains 1.2 million vehicle entries with the Mileage, VIN, Make, Model, Year, State, and City features for each vehicle \cite{original_dataset}. In the report, Kumbar, Gadre, and Nayak compare seven different methodologies to find which one provided the most accurate vehicle price: Linear Regression \cite{model:multiple_linear_regression}, Random Forest \cite{model:random_forest}, Gradient Boost \cite{model:gradient_boost}, XGBoost \cite{model:xg_boost}, LightGBM \cite{model:light_gbm}, KMeans + Linear Regression \cite{model:kmeans_linear_regression}, and a Deep Neural Network \cite{model:neural_network}. The results from the baseline project showed that Linear Regression was the preferred model with the highest $R^2$ score for the lowest training time, with KMeans + Linear Regression as the second best.
+
+The baseline project was lacking, however, in several areas. First, and most important, the training times for all of the baseline's models are too long. For Linear Regression \cite{model:kmeans_linear_regression}, one of the fastest and simplest models, the training time is 15 minutes. That is much too long for a user to wait to get a result. Another fault with the baseline project is the lack of high accuracy. The best $R^2$ score for the testing data is 88\%. That leaves 12\% error, which could cost a user hundreds or even thousands of dollars. Finally, the baseline project's dataset is lacking in features. While the dataset is large, containing over 1.2 million entries, it contains only 5 usable features \cite{original_dataset}. This is not nearly enough to determine an accurate result from such a diverse list of cars.
+
+This project's intended purpose is to solve consumers, private car sellers, and car salesmen's problems with used cars by building upon the foundation of the baseline project. This project intends to improve upon the lack of features in the baseline project's dataset by finding a dataset with more features such as vehicle condition and transmission type. This will allow for a better estimation, even if there are fewer datapoints. Overall, this project will eliminate the manual activity of searching through used car listings to find an optimal price: a process which tends to be quite inaccurate both for all users. Hopefully, a clear relationship will develop between a car's features and it's price that can be developed into an easy-to-use model.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%
 \section{Related works} 
-The baseline model for this project was from a report published by Kumbar, Gadre, and Nayak \cite{baseline} in which they attempt to predict car prices based on a different feature set. The data for their model contained the Mileage, VIN, Make, Model, Year, State, and City features of the vehicle. For preprocessing, the baseline model pruned their dataset to three standard deviations around the mean and encoded their categorical features using a one hot encoding scheme. The baseline model compared seven different methodologies to find the most accurate: Linear Regression, Random Forest, Gradient Boost, XGBoost, LightGBM, KMeans + Linear Regression, and a Deep Neural Network. Ultimately, the results from the baseline model showed that Linear Regression was the preferred model with the highest $R^2$ score for the lowest training time.
+Many other studies have been done in regards to predicting the price of used cars through machine learning. In a conference paper by Pal, Arora, Kohli, Sundararaman, and Palakurthy \cite{article:relatedwork1}, they attempt to solve this problem using a Random Forest \cite{model:random_forest} model. They found that, through using a supervised Random Forest method with 500 Decision Trees that chose highly correlated features, they could achieve a training accuracy of 95.82\% and a testing accuracy of 83.63\%.
 
-The baseline model's results are good, however they can be improved upon. There were very few features in the model's dataset, so finding data with more features, even if it results in a reduction of datapoints, would be beneficial. In addition, the baseline model pruned outliers which could have benefited the model's learning process. Therefore, retaining outliers while training would improve the model. These are some of the points I intend to improve upon in this project.
+In a different article \cite{article:relatedwork2}, Pudaruth used four different models to predict a used car's price based off of its features: Multiple Linear Regression \cite{model:multiple_linear_regression}, K-Nearest Neighbors (KNN) \cite{model:k_nearest_neighbors}, Decision Trees \cite{model:decision_trees}, and Naïve Bayes \cite{model:naive_bayes}. Pudaruth's work is unique in that he uses a mix of regression and classification models to attempt to solve a problem that cannot naturally be divided into classes. Ultimately, though he attempted to overcome this obstacle by creating price ranges, his results are inconclusive. The Mean Absolute Error (MAE) for each of his models varies per car model from 27,000 to 45,000, and his classification models had an accuracy between 60 and 70\%.
 
-Other works related to this project include \cite{article:prediction1} where only a Random Forest model is used to attempt to solve the same problem. Their resulting model had a 95\% training accuracy and an 83\% testing accuracy. Another work is \cite{article:prediction2} where four models were used to predict car prices: Multiple Linear Regression, K-Nearest Neighbors, Decision Trees, and Nïeve Bayes. The results from this article were mixed, but since several of the methods had to preprocess the data into classes first, it tended towards being inaccurate. This led me to the conclusion that I wanted to stick with regression models.
+Another model, this time by Wijnhoven and Plant \cite{article:relatedwork3}, used Sentiment Analysis \cite{model:sentiment_analysis} to determine car sales rather than using a car's features. This model compared social media posts and Google Trends data with a linear regression model of eleven car types on the Dutch market. The results showed that Google Trends data, along with general attention about a car model, showed a significant impact on sales while social media did little.
 
-Another work to determine the price of a used car attempted to use sentiment analysis rather than features \cite{article:prediction3}. The results from this study were interesting and fairly accurate, however since I specifically wished to create a model that predicted a price based on features, I felt this was not the route for me, however it would be a good addition in a future project. A final related work is \cite{article:prediction4}. This work, combined with elements from the baseline, is what I was aiming for in this project. The model from this work followed a multiple linear regression model, ran off a dataset with many rich features, and seemed very sturdy in most instances. 
+This model by Mazumdar \cite{article:relatedwork4} is based upon Multiple Linear Regression \cite{model:multiple_linear_regression} and consists of a dataset of 370,000 cars scraped from eBay. The feature set includes body style, mileage, a damage value, make and model, gear type, and much more. Ultimately, the resulting linear model used a subset of the total feature set to more accurately portray all types of vehicles. The result from the model was an $R^2$ score of .81, which Mazumdar determined to be accurate for the project's needs.
+
+Gon{\c{c}}alves created a model to predict the price of cars using the textual description of the cars \cite{article:relatedwork5}. Specifically using the unstructured, textual description in the car's listing, he achieved an $R^2$ accuracy score of 77\% and a Mean Squared Error (MSE) of 0.19 using a Support Vector Machine (SVM) \cite{model:svm} Model.
+
+In a paper by Varshitha, Jahnavi, and Lakshmi \cite{article:relatedwork6}, the used car industry in India, still in it's infancy compared to other countries, is explored. The paper attempts to create a model in which no bias towards the consumer or merchandiser exists when estimating the price. Ultimately, they found the Random Forest model \cite{model:random_forest} was the most accurate with a MAE of 1.097 and and $R^2$ error value of 77\%.
+
+In another work, Lin, Marlow, and Dixon \cite{article:relatedwork7} used a Neural Network \cite{model:neural_network}, Random Forest \cite{model:random_forest}, and Linear Regression \cite{model:multiple_linear_regression} to determine the true price of used cars on an auction website. Their results, using Root Mean Squared Error (RMSE) and $R^2$ error, led to the conclusion that both the Neural Network and Random Forest models had a satisfactory prediction, with an $R^2$ error over .5 and a low RMSE for each.
+
+Wang, Zhang, and Wang \cite{article:relatedwork8} used a Random Forest \cite{model:random_forest} approach to predict the prices of used cars in China. Their results showed that the Random Forest model ran well, with an $R^2$ error of .98.
+
+In attempting to predict the price of used cars, Samruddhi and Kumar \cite{article:relatedwork9} used the KNN \cite{model:k_nearest_neighbors} model. Using this model they were able to heavily optimize by constantly manipulating the K value. Through their resulting experimentation, their model achieved an $R^2$ error of 85\%
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%
 \section{Approach (and technical correctness)}
 \subsection{Selecting a Dataset}
-I began my project by selecting an appropriate dataset. I was specifically looking for a set with many datapoints and features. Combined, both factors can help reduce overfitting. I began creating my model with the dataset from the baseline report \cite{original_dataset}, but while it had a large number of datapoints, it was heavily lacking in features. However, I was able to find a second dataset that still contained an adequate amount of datapoints while providing many more descriptive features \cite{dataset}.
-\subsection{Preprocessing}
-Next came preprocessing: getting the data ready to run through the model. In this step, I removed all empty entries from the data, unified the text data to a single format, and dropped columns which contained irrelevant data for predicting the price, such as VIN numbers (unique to each vehicle) and the date of sale. Ultimately, this process removed outliers as shown from Figure \ref{fig:before_process} and Figure \ref{fig:after_process} and made the data much more useable for the future model.
-\begin{figure}[h]
-    \centering
-    \includegraphics[width=.35\textwidth]{images/before_preprocessing.png}
-    \caption{Graph of the numeric factors before processing}
-    \label{fig:before_process}
-\end{figure}
-\begin{figure}[h]
-    \centering
-    \includegraphics[width=.35\textwidth]{images/after_preprocessing.png}
-    \caption{Graph of the numeric factors after processing}
-    \label{fig:after_process}
-\end{figure}
-After removing all irrelevant factors, the categorized factors such as make, model, transmission, and color were encoded using OneHotEncoding. This allows each category in each factor to have a binary representation. At this point, the data was fully preprocessed, in a numeric format, and ready to be used in a model.
-\subsection{Plotting}
-From here, I had to learn which features had the most linear pattern when compared to the price of the vehicle. This could only be achieved by plotting each feature to the price and observing the shape.
-\begin{figure}[h]
-    \centering
-    \includegraphics[width=.45\textwidth]{images/linearity.png}
-    \caption{The vehicle's year, condition, odometer reading, and MMR (wholesale market value) mapped with the selling price}
-    \label{fig:linearity}
-\end{figure}
-As shown in Figure \ref{fig:linearity}, there is a strong positive linear correlation between the MMR and the selling price, a weak positive linear correlation between the vehicle's year and condition again the selling price, and a strong negative correlation between the reading on the vehicle's odometer and selling price. These readings are backed up by a heatmap of these features in Figure \ref{fig:heat}, showing a strong positive correlation between the selling price and MMR, and a strong negative correlation between the selling price and the odometer reading.
-\begin{figure}[h]
-    \centering
-    \includegraphics[width=.45\textwidth]{images/heatmap.png}
-    \caption{Heatmap of the continuous features: Green = strong positive correlation, Red = strong negative correlation}
-    \label{fig:heat}
-\end{figure}
-\subsection{Linear Regression Model}
-Since there was such a strong linear connection between the continuous features and the price, I decided to first implement a linear regression model, as it is the easiest and quickest model to setup. It is a multiple linear regression model with 4 continuous features, 8 categorized features, and one dependant variable.
-\subsection{Neural Network Model}
-I also created a traditional ANN style neural network model, as I felt it had a good chance of providing a more accurate result than the linear regression model, albeit at the cost of a longer training time. The model uses two hidden layers of 125 and 25 nodes respectively. It takes the same input as the linear regression model.
-%%%%%%%%%%%%%%%%%
+This project began by selecting an appropriate dataset: specifically one with a large number of descriptive features with a fair amount of entries. Combined, both factors would reduce overfitting. The first option was the dataset from the baseline report \cite{original_dataset}. However, while it had a large number of datapoints, it was heavily lacking in features. This is inclined to overfitting. Upon this realization a second dataset was chosen that still contained around 500,000 datapoints while providing many more descriptive features like condition, transmission type, and general vehicle type \cite{dataset}.
+\subsection{Data Preprocessing}
+In preprocessing the data, several features were removed which were unique to each vehicle and did not provide information towards the price: the VIN number, the seller, and the date of sale. Another feature which had to be dropped was the trim feature because it was highly dependant on the model of the car, which would lead to an incorrect regression algorithm. The remaining features were year, make, model, body style, transmission, state the car is located in, condition of the car, the odometer reading, the exterior color, the interior color, the Manheim Market Report or wholesale value \cite{website:mmr} (MMR), and the selling price. After unifying the text data to a single format, all entries which contained an empty year, make, body style, condition, odometer reading, MMR, or selling price were dropped. This cleared up all entries which shouldn't exist. Once the outliers outside three standard deviations from the mean were removed, the data was nicely processed and nearly ready for both models as Figure \ref{fig:preprocessing} shows.
 
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=.48\textwidth]{images/preprocessing.png}
+    \caption{Distribution of data entries after preprocessing has completed}
+    \label{fig:preprocessing}
+\end{figure}
+    
+Just before use in a model, however, all text-based categorized factors such as make, model, transmission, and color are encoded to a numerical format using a One-Hot Encoding scheme \cite{model:one_hot_encoding}. This scheme allows each category in each factor to have a binary representation: turning text data into numerical data. Once this encoding is complete, the data is fully preprocessed and is ready to be used in both models.
+\subsection{Plotting}
+Before any models were chosen, the linearity of the data had to be determined. This would allow for an easier decision between which model would be best suited for the chosen dataset. This could most easily be achieved by plotting each feature to the price and observing whether the resulting shape was linear or not. As shown in Figure \ref{fig:mmr_linear}, there is a strong positive linear correlation between the MMR and the selling price and Figure \ref{fig:odometer_linear} shows a strong negative correlation between the reading on the vehicle's odometer and selling price. 
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=.48\textwidth]{images/mmr_to_price.png}
+    \caption{Linearity scatterplot showing the correlation between the MMR and the actual price of the car}
+    \label{fig:mmr_linear}
+\end{figure}
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=.48\textwidth]{images/odometer_to_price.png}
+    \caption{Linearity scatterplot showing the correlation between the vehicle's odometer reading and the price of the car}
+    \label{fig:odometer_linear}
+\end{figure}
+
+The high linearity showcased between the price and other features proved that a linear model was the optimal choice for this project. These readings are further backed up by a heatmap of these features in Figure \ref{fig:heatmap}, showing a strong positive correlation between the selling price and MMR, a strong negative correlation between the selling price and the odometer reading, and lesser, but still significant, correlations between the selling price and the year and condition.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=.48\textwidth]{images/heatmap.png}
+    \caption{Heatmap of the continuous features: Green = strong positive correlation, Red = strong negative correlation}
+    \label{fig:heatmap}
+\end{figure}
+
+\subsection{Linear Regression Model}
+Since there was such a strong linear connection between the continuous features and the price, the first model to be implemented was a linear regression model, as it is the easiest and quickest model to setup. It is a Multiple Linear Regression model \cite{model:multiple_linear_regression} with 4 continuous features, 8 categorized features, and one dependant variable. The data split was 90\% training and 10\% testing for this model since the size of the dataset was so large. The evaluation metrics for this model are the time it takes the model to train, the $R^2$ score, the MSE, and the RMSE.
+\subsection{SVM Model}
+In addition to the linear regression model, this project needed a secondary model as a comparison tool. An SVM \cite{model:svm} was chosen since they are fast, easy to manipulate, and work well for linear data. This model also uses the dataset of 4 continuous features, 8 categorized features, and one dependant variable. The data split was also 90\% training and 10\% testing since the dataset was the same. The evaluation metrics for this model are the time it takes the model to train, the $R^2$ score, the MSE, and the RMSE.
+
+
+%%%%%%%%%%%%%%%%%
 \section{Experimental results (and technical correctness)}
 \subsection{Experimental Environment}
-Both of my models were written in Python using the pandas, sklearn, keras, tenserflow, and matplotlib libraries. All models were run on a computer with a 4 core, 3.5GHz CPU and 16GB of memory. The models were not GPU enhanced. In addition, the data split was 85\% training and 15\% testing.
-\subsection{Neural Network Parameters}
-The neural network model has two hidden layers of 125 and 25 nodes respectively. Each hidden layer uses the ReLu activation function with the final output later using a linear activation function. The model's compiler implements the Adam optimizer with a learning rate of 0.001. The model runs for 250 epochs at around 12,547 samples per epoch. The number of layers, the learning rate, and the number of epochs were all determined by training and comparing multiple different models through TenserBoard. The Mean Squared Error loss function was chosen to determine loss as it measures both variance and bias in the model.
+Both of the project's models were written in Python using the pandas \cite{lib:pandas}, sklearn \cite{lib:sklearn}, and matplotlib \cite{model:matplotlib} libraries. All models were run on a computer with a 4 core, 3.5GHz CPU, 16GB of memory, and an RX580 GPU with 4GB of memory. The models were not GPU enhanced. Both models ran on a data split of 90\% training and 10\% testing. The total number of samples within the dataset is 518,087. Table \ref{table:environment} encapsulates this data.
 
-As an added speed improvement, I implemented early stopping within the model that ends training when the loss does not improve over 10 consecutive epochs. If this is found, the weights from the epoch with the least loss are restored and returned as the result of the model.
-\subsection{Results}
-\begin{table}[h!]
+\begin{table}[h]
 \centering
+\caption{Summary of the environment the project was produced in}
 \begin{tabular}{|l|l|l|}
 \hline
-                       & Linear Regression & Neural Network \\ \hline
-$R^2$ Test Score     & 97.38\%           & 97.54\%        \\ \hline
-$R^2$ Training Score & 97.45\%           & 97.55\%        \\ \hline
-MSE Loss               & 2,362,095         & 2,265,596      \\ \hline
-Training Time          & 3.64 minutes      & 38.52 minutes  \\ \hline
+CPU & 4 Core & 3.5GHz \\ \hline
+Memory & 16GB & 1500MHz \\ \hline
+Graphics Card & RX580 & 4GB \\ \hline
+Data Split & 90\% Training & 10\% Testing\\ \hline
+Sample Split & 466,278 Training & 51,809 Testing \\ \hline
 \end{tabular}
+\label{table:environment}
+\end{table}
+
+\subsection{Model Parameters}
+For this project's Linear Regression Model, a single-epoch Multiple Linear Regression \cite{model:multiple_linear_regression} model was chosen. The model is fit once to the training data, then its accuracy is measured using the $R^2$ metric, MSE, and RMSE. The result is then reported to the user. Similarly, this project's SVM \cite{model:svm} model uses a linear kernal to emulate linear regression. The tolerance value for accepting datapoints without question is .075. After standardizing the data, the SVM model is fit once to the training data and its accuracy is measured in an identical manner to the Linear Regression model: $R^2$ accuracy, MSE, and RMSE. MSE \cite{website:mse} is measured by the equation \[\frac{\sum(y_i - \hat{y}_i)^2}{n}\] while RMSE \cite{website:rmse} is measured by the equation \[\sqrt{\frac{\sum(y_i - \hat{y}_i)^2}{n}}\]
+\subsection{Results}
+As Table \ref{table:results} shows, both models resulted in similar $R^2$ scores for the testing data and similar $R^2$ scores for the training data. In addition, both models have a similar MSE loss. Therefore, these models are approximately 97\% accurate when given all required features. Also, since the RMSE for each model is approximately 1,450, there is a \$1,450 dollar difference between the true price of the car and the estimated price.
+
+\begin{table}[h]
+\centering
 \caption{Results after training and testing both models}
+\begin{tabular}{|l|l|l|}
+\hline
+                     & Linear Regression & SVM \\ \hline
+$R^2$ Test       & 96.84\%           & 96.74\%        \\
+Accuracy           & & \\ \hline
+$R^2$ Training       & 96.84\%           & 96.72\%        \\
+Accuracy       & & \\ \hline
+MSE Loss             & 2,022,285         & 2,097,970      \\ \hline
+RMSE Loss            & 1,422.07         & 1448.44      \\ \hline
+Training Time        & 44 seconds      & 38 seconds  \\ \hline
+\end{tabular}
 \label{table:results}
 \end{table}
-As Table \ref{table:results} shows, both models resulted in highly similar $R^2$ scores for the testing data. In addition, both models have a similar Mean Squared Error loss. Therefore, these models are approximately 97\% accurate when given all required features. Also, the square root of the Mean Squared Error for each model is approximately 1,500. This verifies the effectiveness of the models because there is only about a 1,500 dollar difference between the true price of the car and the estimated price.
 
-However, accuracy is not the only metric I measured. Both models took a drastically different amount of time to train. Linear regression only took around three and a half minutes while the neural network took 38 and a half minutes. Therefore, the linear regression model was faster by a factor of ten! Since both models resulted in similar accuracies, the linear regression model seems to be the better model of the two as it is much quicker to train.
+However, accuracy is not the only measured metric. Both models were measured in the total time it took to train the model and produce a result. Surprisingly, even with a huge dataset, both models took less than a minute to train. Both models, when compared to the baseline, are much more accurate and much quicker to train.
 
-When compared to the baseline model, the results are as expected.
+\begin{table}[h]
+\centering
+\caption{Results from the baseline project compared to this project}
+\begin{tabular}{|l|l|l|l|}
+\hline
+Learning Algorithm & $R^2$ Test & $R^2$ Training & Training Time \\ 
+    & Accuracy    & Accuracy &           \\ \hline
+Linear Regression & 0.87 & 0.87 & 15 minutes \\ \hline
+Gradient Boost & 0.64 & 0.64 & 130 minutes \\ \hline
+Random Forest & 0.88 & 0.98 & 75 minutes \\ \hline
+Light GBM & 0.81 & 0.82 & 104 seconds \\ \hline
+XGBoost & 0.78 & 0.81 & 180 minutes \\ \hline
+KMeans + LinReg & 0.88 & 0.89 & 70 minutes \\ \hline
+Neural Network & 0.85 & 0.85 & 10 hours \\ \hline
+\textbf{This Project's} & \textbf{0.97} & 0.97 & \textbf{44 seconds} \\ 
+\textbf{Linear Regression} & & & \\ \hline
+\textbf{This Project's SVM} & \textbf{0.97} & 0.97 & \textbf{38 seconds} \\ \hline
+\end{tabular}
+\label{table:baseline_results}
+\end{table}
+
+As Table \ref{table:baseline_results} shows, all of the baseline's models are significantly slower than this project's two models and none of the baseline's models' accuracies reach above 90\%. This is further shown through Figures \ref{fig:results1}, \ref{fig:results2}, and \ref{fig:results3}.
+
 \begin{figure}[h]
     \centering
-    \includegraphics[width=.45\textwidth]{images/baseline_results.png}
-    \caption{Results from the baseline project}
-    \label{fig:base_result}
+    \includegraphics[width=.48\textwidth]{images/results1.png}
+    \caption{$R^2$ training accuracy for both the baseline's models and this project's models}
+    \label{fig:results1}
 \end{figure}
-As Figure \ref{fig:base_result} shows, the baseline's Linear Regression and Deep Neural Network models had similar accuracies while the Linear Regression model was much faster. However, compared to the baseline, this project's models are much more accurate. I believe this was due to the extra factors implemented in the dataset I used. They allowed for more flexability within the model to more accurately predict a used car's price.
-%%%%%%%%%%%%%%%%%%%%
 
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=.48\textwidth]{images/results2.png}
+    \caption{$R^2$ testing accuracy for both the baseline's models and this project's models}
+    \label{fig:results2}
+\end{figure}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=.48\textwidth]{images/results3.png}
+    \caption{Training times for both the baseline's models and this project's models}
+    \label{fig:results3}
+\end{figure}
+
+
+%%%%%%%%%%%%%%%%%%%%
 \section{Conclusion} 
-Since both models were highly accurate, both would be acceptable to use when predicting used car prices. However, accuracy is not the only important factor when creating a model. As the linear regression model was ten times faster to train without any major accuracy penalties, the linear regression model stands as the best model to predict used car prices from a set of features in this circumstance. As both models stand now, I would prefer the linear regression model for the most accurate prediction in the least amount of time.
-\subsection{Future Work}
-In the future to improve this project, I would find a dataset with both more recent car listings and a larger feature set. Another viable addition would be to search and find accident claims based on a vehicle's VIN number. This would allow for another highly sought after feature. Finally, the neural network could certainly be optimized further, whether through adding more layers or through general tweaking. However, with an $R^2$ test accuracy of 97\%, the current model is certainly accurate enough for everyday use.
+As both models were highly accurate, above 95\%, both would be acceptable to predicting used car prices. The error for both models is within \$1,450. Additionally, since both models took a similar time to train, the most flexible and potentially powerful model would be the best. This project's SVM \cite{model:svm} model fits perfectly within that criteria. Since it is able to predict the prices of cars given a feature set so accurately, all users, whether individual car buyers, car salesmen, or private car sellers, can easily benefit. 
+
+This project could be further improved upon by implementing it on a dataset with more recent car listings and a larger feature set. The more features available for training and the more recent the training vehicle listings are, the more accurate the final test results will be. Another viable addition would be to search and find accident claims based on a vehicle's VIN number. This would allow for another highly sought after feature: whether a car has even been in an accident. Finally, further optimization of the SVM \cite{model:svm}, possibly improving upon the kernel, fine-tuning the epsilon value, or implementing a better tolerance value. However, with an $R^2$ test accuracy of 97\%, the current model is certainly accurate enough for any user to predict the true value of their car.
+
 
 %%%%%%%%%%%%%%%%%%%%%%%
 \bibliographystyle{IEEEtran}
